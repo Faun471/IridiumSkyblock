@@ -52,9 +52,6 @@ public class Commands {
     public AddValueCommand addValueCommand = new AddValueCommand();
     public RemoveValueCommand removeValueCommand = new RemoveValueCommand();
     public ExpelCommand expelCommand = new ExpelCommand();
-<<<<<<< Updated upstream
-=======
     public PurgeCommand purgeCommand = new PurgeCommand();
     public ResetCrystalsCommand resetCrystalsCommand = new ResetCrystalsCommand();
->>>>>>> Stashed changes
 }
