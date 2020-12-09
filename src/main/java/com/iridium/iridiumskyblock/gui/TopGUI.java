@@ -58,7 +58,11 @@ public class TopGUI extends GUI implements Listener {
             e.setCancelled(true);
             if (e.getClickedInventory() == null || !e.getClickedInventory().equals(getInventory())) return;
             if (e.getSlot() == getInventory().getSize() - 5 && IridiumSkyblock.getInventories().backButtons) {
-                e.getWhoClicked().openInventory(User.getUser((Player) e.getWhoClicked()).getIsland().getIslandMenuGUI().getInventory());
+                if (User.getUser((Player) e.getWhoClicked()).getIsland() != null) {
+                    e.getWhoClicked().openInventory(User.getUser((Player) e.getWhoClicked()).getIsland().getIslandMenuGUI().getInventory());
+                } else {
+                    e.getWhoClicked().closeInventory();
+                }
             }
             if (islands.containsKey(e.getSlot())) {
                 e.getWhoClicked().closeInventory();

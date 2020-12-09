@@ -1,6 +1,10 @@
 package com.iridium.iridiumskyblock.listeners;
 
-import com.iridium.iridiumskyblock.*;
+import com.iridium.iridiumskyblock.IridiumSkyblock;
+import com.iridium.iridiumskyblock.Island;
+import com.iridium.iridiumskyblock.User;
+import com.iridium.iridiumskyblock.Utils;
+import com.iridium.iridiumskyblock.managers.IslandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -24,11 +28,12 @@ public class PlayerTeleportListener implements Listener {
             if (toIsland == null) return;
 
             final Player player = event.getPlayer();
+            Bukkit.getScheduler().scheduleSyncDelayedTask(IridiumSkyblock.getInstance(), () -> toIsland.sendHomograms(player), 1);
             final User user = User.getUser(player);
 
             if (event.getCause().equals(TeleportCause.ENDER_PEARL)) {
                 Island fromIsland = islandManager.getIslandViaLocation(fromLocation);
-                if (fromIsland == null || fromIsland.isInIsland(toLocation)) {
+                if (fromIsland == null || !fromIsland.isInIsland(toLocation)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -38,7 +43,6 @@ public class PlayerTeleportListener implements Listener {
             if ((toIsland.isVisit() && !toIsland.isBanned(user)) || user.bypassing) {
                 if (!toIsland.isInIsland(fromLocation)) {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(IridiumSkyblock.getInstance(), () -> toIsland.sendBorder(player), 1);
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(IridiumSkyblock.getInstance(), () -> toIsland.sendHomograms(player), 1);
                     if (user.islandID != toIsland.getId()) {
                         player.sendMessage(Utils.color(IridiumSkyblock.getMessages().visitingIsland.replace("%player%", User.getUser(toIsland.getOwner()).name).replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
                         if (player.hasPermission("iridiumskyblock.silentvisit")) return;

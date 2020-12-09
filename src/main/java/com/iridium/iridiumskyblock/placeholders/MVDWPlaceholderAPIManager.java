@@ -6,6 +6,7 @@ import com.iridium.iridiumskyblock.Island;
 import com.iridium.iridiumskyblock.User;
 import com.iridium.iridiumskyblock.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.text.NumberFormat;
@@ -258,9 +259,13 @@ public class MVDWPlaceholderAPIManager {
 
         for (int i = 0; i < 10; i++) { //TODO there is probably a more efficient way to do this?
             int finalI = i;
-            PlaceholderAPI.registerPlaceholder(IridiumSkyblock.getInstance(), "iridiumskyblock_island_top_name_" + (i + 1), e -> {
+            PlaceholderAPI.registerPlaceholder(IridiumSkyblock.getInstance(), "iridiumskyblock_island_top_owner_" + (i + 1), e -> {
                 List<Island> islands = Utils.getTopIslands();
                 return islands.size() > finalI ? User.getUser(Utils.getTopIslands().get(finalI).getOwner()).name : IridiumSkyblock.getConfiguration().placeholderDefaultValue;
+            });
+            PlaceholderAPI.registerPlaceholder(IridiumSkyblock.getInstance(), "iridiumskyblock_island_top_name_" + (i + 1), e -> {
+                List<Island> islands = Utils.getTopIslands();
+                return islands.size() > finalI ? phCheckIfStripped(Utils.getTopIslands().get(finalI).getName()) : IridiumSkyblock.getConfiguration().placeholderDefaultValue;
             });
             PlaceholderAPI.registerPlaceholder(IridiumSkyblock.getInstance(), "iridiumskyblock_island_top_value_" + (i + 1), e -> {
                 List<Island> islands = Utils.getTopIslands();
@@ -271,5 +276,12 @@ public class MVDWPlaceholderAPIManager {
                 return islands.size() > finalI ? Utils.NumberFormatter.format(Math.floor(Utils.getTopIslands().get(finalI).getValue() / IridiumSkyblock.getConfiguration().valuePerLevel)) : IridiumSkyblock.getConfiguration().placeholderDefaultValue;
             });
         }
+    }
+
+    public String phCheckIfStripped(String ph) {
+        if (IridiumSkyblock.getConfiguration().stripTopIslandPlaceholderColors) {
+            return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', ph)).replace("\"","\\\"");
+        }
+        return ph.replace("\"","\\\"");
     }
 }

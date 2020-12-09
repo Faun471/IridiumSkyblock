@@ -3,6 +3,7 @@ package com.iridium.iridiumskyblock.listeners;
 import com.cryptomorin.xseries.XMaterial;
 import com.iridium.iridiumskyblock.*;
 import com.iridium.iridiumskyblock.configs.Missions;
+import com.iridium.iridiumskyblock.managers.IslandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -82,11 +83,9 @@ public class BlockBreakListener implements Listener {
             final Island island = islandManager.getIslandViaLocation(location);
             if (island == null) return;
 
-            if (Utils.isBlockValuable(block)) {
-                final Material material = block.getType();
-                final String materialName = XMaterial.matchXMaterial(material).name();
-                island.valuableBlocks.computeIfPresent(materialName, (name, original) -> original - 1);
-
+            final XMaterial xmaterial = XMaterial.matchXMaterial(block.getType());
+            if (Utils.isBlockValuable(block) || IridiumSkyblock.getConfiguration().limitedBlocks.containsKey(xmaterial)) {
+                island.valuableBlocks.computeIfPresent(xmaterial.name(), (name, original) -> original - 1);
                 Bukkit.getScheduler().runTask(IridiumSkyblock.getInstance(), island::calculateIslandValue);
             }
 
@@ -98,6 +97,7 @@ public class BlockBreakListener implements Listener {
                 } else {
                     island.stackedBlocks.compute(location, (loc, original) -> original - 1);
                 }
+                //This needs to be ran a tick later since blockbreakevent gets called before the block gets removed
                 Bukkit.getScheduler().runTask(IridiumSkyblock.getInstance(), () -> blockState.update(true, true));
                 island.sendHomograms();
             }

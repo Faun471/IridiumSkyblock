@@ -20,7 +20,7 @@ public class PlayerTalkListener implements Listener {
 
             if (user.warp != null) {
                 if (user.warp.getPassword().equals(event.getMessage())) {
-                    Bukkit.getScheduler().runTask(IridiumSkyblock.getInstance(), () -> player.teleport(user.warp.getLocation()));
+                    Bukkit.getScheduler().runTask(IridiumSkyblock.getInstance(), () -> { player.teleport(user.warp.getLocation()); user.warp = null; });
                     player.sendMessage(Utils.color(IridiumSkyblock.getMessages().teleporting
                             .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
                 } else {

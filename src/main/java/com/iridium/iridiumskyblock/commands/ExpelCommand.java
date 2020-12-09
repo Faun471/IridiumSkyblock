@@ -18,19 +18,18 @@ public class ExpelCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (args.length == 1){
-            Player p = (Player) sender;
-            p.openInventory(User.getUser(p).getIsland().getVisitorGUI().getInventory());
-            return;
-        }
-        if (args.length != 2) {
+        if (args.length > 2) {
             sender.sendMessage(IridiumSkyblock.getConfiguration().prefix + "/is expel <player>");
             return;
         }
         Player p = (Player) sender;
         Island island = User.getUser(p).getIsland();
-        Player visitor = Bukkit.getPlayer(args[1]);
         if (island != null) {
+            if (args.length == 1){
+                p.openInventory(User.getUser(p).getIsland().getVisitorGUI().getInventory());
+                return;
+            }
+            Player visitor = Bukkit.getPlayer(args[1]);
             if (visitor != null) {
                 if (!island.equals(User.getUser(visitor).getIsland())) {
                     if (island.isInIsland(visitor.getLocation())) {

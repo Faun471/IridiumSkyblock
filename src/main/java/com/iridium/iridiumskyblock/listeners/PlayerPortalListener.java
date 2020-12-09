@@ -3,8 +3,8 @@ package com.iridium.iridiumskyblock.listeners;
 import com.cryptomorin.xseries.XMaterial;
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.iridium.iridiumskyblock.Island;
-import com.iridium.iridiumskyblock.IslandManager;
 import com.iridium.iridiumskyblock.User;
+import com.iridium.iridiumskyblock.managers.IslandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -31,7 +31,7 @@ public class PlayerPortalListener implements Listener {
             if (!event.getCause().equals(PlayerTeleportEvent.TeleportCause.NETHER_PORTAL)) return;
 
             if (!IridiumSkyblock.getConfiguration().netherIslands) {
-                event.setCancelled(true);
+                if (!IridiumSkyblock.getConfiguration().publicNetherPortals) event.setCancelled(true);
                 return;
             }
 

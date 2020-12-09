@@ -7,6 +7,7 @@ import com.iridium.iridiumskyblock.User;
 import com.iridium.iridiumskyblock.Utils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.text.NumberFormat;
@@ -120,6 +121,15 @@ public class ClipPlaceholderAPIManager extends PlaceholderExpansion {
             try {
                 Integer integer = Integer.parseInt(placeholder.replace("island_top_name_", ""));
                 List<Island> islands = Utils.getTopIslands();
+                return islands.size() > integer - 1 ? phCheckIfStripped(Utils.getTopIslands().get(integer - 1).getName()) : IridiumSkyblock.getConfiguration().placeholderDefaultValue;
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        if (placeholder.startsWith("island_top_owner_")) {
+            try {
+                Integer integer = Integer.parseInt(placeholder.replace("island_top_owner_", ""));
+                List<Island> islands = Utils.getTopIslands();
                 return islands.size() > integer - 1 ? User.getUser(Utils.getTopIslands().get(integer - 1).getOwner()).name : IridiumSkyblock.getConfiguration().placeholderDefaultValue;
             } catch (NumberFormatException e) {
                 e.printStackTrace();
@@ -145,4 +155,12 @@ public class ClipPlaceholderAPIManager extends PlaceholderExpansion {
         }
         return null;
     }
+
+    public String phCheckIfStripped(String ph) {
+        if (IridiumSkyblock.getConfiguration().stripTopIslandPlaceholderColors) {
+            return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', ph)).replace("\"","\\\"");
+        }
+        return ph.replace("\"","\\\"");
+    }
+
 }

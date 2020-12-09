@@ -12,6 +12,7 @@ import com.iridium.iridiumskyblock.configs.*;
 import com.iridium.iridiumskyblock.configs.Missions.Mission;
 import com.iridium.iridiumskyblock.configs.Missions.MissionData;
 import com.iridium.iridiumskyblock.gui.*;
+import com.iridium.iridiumskyblock.managers.IslandManager;
 import com.iridium.iridiumskyblock.support.SpawnerSupport;
 import lombok.Getter;
 import lombok.Setter;
@@ -280,7 +281,11 @@ public class Island {
                 if (original == null) return stackedBlocks.get(location) - 1;
                 return original + (stackedBlocks.get(location) - 1);
             });
+            if (xMaterial == XMaterial.AIR || xMaterial == XMaterial.CAVE_AIR || xMaterial == XMaterial.VOID_AIR) {
+                stackedBlocks.remove(location);
+            }
         }
+        Bukkit.getScheduler().runTask(IridiumSkyblock.getInstance(), (Runnable) this::sendHomograms);
 
         for (int x = minx; x <= maxx; x++) {
             for (int z = minz; z <= maxz; z++) {
@@ -746,6 +751,7 @@ public class Island {
             }};
         }
         Bukkit.getScheduler().runTaskLater(IridiumSkyblock.getInstance(), (Runnable) this::sendBorder, 20);
+        Bukkit.getScheduler().runTaskLater(IridiumSkyblock.getInstance(), (Runnable) this::sendHomograms, 20);
     }
 
     public long canGenerate() {
@@ -786,6 +792,7 @@ public class Island {
     }
 
     private void pasteSchematic() {
+        stackedBlocks.clear();
         for (Schematics.FakeSchematic fakeSchematic : IridiumSkyblock.getSchematics().schematics) {
             if (!fakeSchematic.name.equals(this.schematic)) continue;
             IridiumSkyblock.worldEdit.paste(new File(IridiumSkyblock.schematicFolder, schematic), getCenter().clone().add(fakeSchematic.xOffset, fakeSchematic.yOffset, fakeSchematic.zOffset), this);
@@ -802,18 +809,23 @@ public class Island {
             for (String player : members) {
                 User user = User.getUser(player);
                 Player p = Bukkit.getPlayer(user.name);
-                if (p != null) p.getInventory().clear();
+                if (p != null) {
+                    p.getInventory().clear();
+                    if (IridiumSkyblock.getConfiguration().clearEnderChests) p.getEnderChest().clear();
+                }
             }
         }
     }
 
     public void sendHomograms(Player player) {
+        World world = player.getWorld();
         User user = User.getUser(player);
         for (Object object : user.getHolograms()) {
             IridiumSkyblock.nms.removeHologram(player, object);
         }
         user.clearHolograms();
         for (Location location : stackedBlocks.keySet()) {
+            if (location.getWorld() != world) continue;
             Block block = location.getBlock();
             int amount = stackedBlocks.get(location);
             IridiumSkyblock.nms.sendHologram(player, block.getLocation().add(0.5, -0.5, 0.5), Utils.processMultiplePlaceholders(IridiumSkyblock.getMessages().stackedBlocksHologram, Arrays.asList(new Utils.Placeholder("amount", amount + ""), new Utils.Placeholder("block", XMaterial.matchXMaterial(block.getType()).toString()))));
@@ -1031,7 +1043,7 @@ public class Island {
                 BaseComponent[] components = TextComponent.fromLegacyText(Utils.color(IridiumSkyblock.getMessages().coopInvite.replace("%player%", User.getUser(island.getOwner()).name).replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
 
                 ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is coop " + User.getUser(island.getOwner()).name);
-                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to coop players island!").create());
+                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(IridiumSkyblock.getMessages().coopHoverMessage).create());
                 for (BaseComponent component : components) {
                     component.setClickEvent(clickEvent);
                     component.setHoverEvent(hoverEvent);
