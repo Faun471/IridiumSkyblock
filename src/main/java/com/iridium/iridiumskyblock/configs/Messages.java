@@ -40,6 +40,7 @@ public class Messages {
     public String giveCrystals = "%prefix% &7You gave %player% %crystals% crystals.";
     public String givenCrystals = "%prefix% &7You have been given %crystals% crystals by %player%.";
     public String removedcrystals = "%prefix% &7You took %crystals% crystals from %player%.";
+    public String resetCrystals = "%prefix% &7You've set %player%'s crystals to 0.";
     public String wrongPassword = "%prefix% &7Wrong password.";
     public String enterPassword = "%prefix% &7Enter password.";
     public String teleportingHome = "%prefix% &7Teleporting home...";
