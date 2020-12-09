@@ -51,7 +51,7 @@ public class Shop {
                     new ShopItem(XMaterial.MELON, "&9&lMelon", 10, 30, 6, 0, 0, 10, 1),
                     new ShopItem(XMaterial.APPLE, "&9&lApple", 10, 20, 4, 0, 0, 11, 1),
                     new ShopItem(XMaterial.GOLDEN_APPLE, "&9&lGolden Apple", 10, 30, 10, 0, 0, 12, 1),
-                    new ShopItem(XMaterial.ENCHANTED_GOLDEN_APPLE, "&9&lEnchanted Golden Apple", 1000, 200, 6, 0, 0, 13, 1),
+                    new ShopItem(XMaterial.ENCHANTED_GOLDEN_APPLE, "&9&lEnchanted Golden Apple", 10, 1000, 200, 0, 0, 13, 1),
                     new ShopItem(XMaterial.CARROT, "&9&lCarrot", 10, 20, 4, 0, 0, 14, 1),
                     new ShopItem(XMaterial.PUMPKIN_PIE, "&9&lPumpkin Pie", 10, 20, 4, 0, 0, 15, 1),
                     new ShopItem(XMaterial.BREAD, "&9&lBread", 10, 25, 5, 0, 0, 16, 1),

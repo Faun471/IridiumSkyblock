@@ -26,7 +26,8 @@ public class BankGUI extends GUI implements Listener {
             setItem(IridiumSkyblock.getInventories().experience.slot == null ? 11 : IridiumSkyblock.getInventories().experience.slot, Utils.makeItemHidden(IridiumSkyblock.getInventories().experience, getIsland()));
             setItem(IridiumSkyblock.getInventories().crystals.slot == null ? 13 : IridiumSkyblock.getInventories().crystals.slot, Utils.makeItemHidden(IridiumSkyblock.getInventories().crystals, getIsland()));
             setItem(IridiumSkyblock.getInventories().money.slot == null ? 15 : IridiumSkyblock.getInventories().money.slot, Utils.makeItemHidden(IridiumSkyblock.getInventories().money, getIsland()));
-            if (IridiumSkyblock.getInventories().backButtons) setItem(getInventory().getSize() - 5, Utils.makeItem(IridiumSkyblock.getInventories().back));
+            if (IridiumSkyblock.getInventories().backButtons)
+                setItem(getInventory().getSize() - 5, Utils.makeItem(IridiumSkyblock.getInventories().back));
         }
 
     }
@@ -42,206 +43,145 @@ public class BankGUI extends GUI implements Listener {
             User u = User.getUser(p);
             if (e.getSlot() == getInventory().getSize() - 5 && IridiumSkyblock.getInventories().backButtons) {
                 e.getWhoClicked().openInventory(getIsland().getIslandMenuGUI().getInventory());
+                return;
             }
             if (!IridiumSkyblock.getConfiguration().bankWithdrawing) {
-                if (e.getSlot() == (IridiumSkyblock.getInventories().experience.slot == null ? 11 : IridiumSkyblock.getInventories().experience.slot)) {
-                    if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
-                        if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
+                p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
+                        .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
+                return;
+            }
+            if (e.getSlot() == (IridiumSkyblock.getInventories().experience.slot == null ? 11 : IridiumSkyblock.getInventories().experience.slot)) {
+                if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
+                    if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
+                        Utils.setTotalExperience(p, Utils.getTotalExperience(p) + island.exp);
+                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -island.exp));
+                        island.exp = 0;
+                    }
+                } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
+                    island.exp += Utils.getTotalExperience(p);
+                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
+                    Utils.setTotalExperience(p, 0);
+                } else if (e.getClick().equals(ClickType.RIGHT)) {
+                    if (Utils.getTotalExperience(p) > 100) {
+                        island.exp += 100;
+                        Utils.setTotalExperience(p, Utils.getTotalExperience(p) - 100);
+                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, 100));
+                    } else {
+                        island.exp += Utils.getTotalExperience(p);
+                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
+                        Utils.setTotalExperience(p, 0);
+                    }
+                } else if (e.getClick().equals(ClickType.LEFT)) {
+                    if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
+                        if (island.exp > 100) {
+                            island.exp -= 100;
+                            Utils.setTotalExperience(p, Utils.getTotalExperience(p) + 100);
+                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -100));
+                        } else {
                             Utils.setTotalExperience(p, Utils.getTotalExperience(p) + island.exp);
                             TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -island.exp));
                             island.exp = 0;
                         }
-                    } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                        island.exp += Utils.getTotalExperience(p);
-                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
-                        Utils.setTotalExperience(p, 0);
-                    } else if (e.getClick().equals(ClickType.RIGHT)) {
-                        if (Utils.getTotalExperience(p) > 100) {
-                            island.exp += 100;
-                            Utils.setTotalExperience(p, Utils.getTotalExperience(p) - 100);
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, 100));
-                        } else {
-                            island.exp += Utils.getTotalExperience(p);
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
-                            Utils.setTotalExperience(p, 0);
-                        }
-                    } else if (e.getClick().equals(ClickType.LEFT)) {
-                        if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                            if (island.exp > 100) {
-                                island.exp -= 100;
-                                Utils.setTotalExperience(p, Utils.getTotalExperience(p) + 100);
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -100));
+                    }
+                }
+            }
+            if (e.getSlot() == (IridiumSkyblock.getInventories().crystals.slot == null ? 13 : IridiumSkyblock.getInventories().crystals.slot)) {
+                if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
+                    if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
+                        if (island.getCrystals() > 0) {
+                            if (p.getInventory().firstEmpty() != -1) {
+                                p.getInventory().addItem(Utils.getCrystals(island.getCrystals()));
+                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, -island.getCrystals()));
+                                island.setCrystals(0);
                             } else {
-                                Utils.setTotalExperience(p, Utils.getTotalExperience(p) + island.exp);
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -island.exp));
-                                island.exp = 0;
+                                p.sendMessage(Utils.color(IridiumSkyblock.getMessages().inventoryFull
+                                        .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
                             }
                         }
                     }
-                }
-                if (e.getSlot() == (IridiumSkyblock.getInventories().crystals.slot == null ? 13 : IridiumSkyblock.getInventories().crystals.slot)) {
-                    if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
-                        p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                    } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                        p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                    } else if (e.getClick().equals(ClickType.RIGHT)) {
-                        p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                    } else if (e.getClick().equals(ClickType.LEFT)) {
-                        p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
+                } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
+                    int i = 0;
+                    int total = 0;
+                    for (ItemStack itemStack : p.getInventory().getContents()) {
+                        if (itemStack == null) {
+                            i++;
+                            continue;
+                        }
+                        int crystals = Utils.getCrystals(itemStack) * itemStack.getAmount();
+                        if (crystals != 0) {
+                            island.setCrystals(island.getCrystals() + crystals);
+                            p.getInventory().clear(i);
+                            total += crystals;
+                        }
+                        i++;
                     }
-                }
-                if (e.getSlot() == (IridiumSkyblock.getInventories().money.slot == null ? 15 : IridiumSkyblock.getInventories().money.slot)) {
-                    if (IridiumSkyblock.getInstance().getEconomy() != null) {
-                        if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
-                            p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                    .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                        } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                            p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                    .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                        } else if (e.getClick().equals(ClickType.RIGHT)) {
-                            p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                    .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                        } else if (e.getClick().equals(ClickType.LEFT)) {
-                            p.sendMessage(Utils.color(IridiumSkyblock.getMessages().withdrawDisabled
-                                    .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
+                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, total));
+                } else if (e.getClick().equals(ClickType.RIGHT)) {
+                    int i = 0;
+                    for (ItemStack itemStack : p.getInventory().getContents()) {
+                        if (itemStack == null) {
+                            i++;
+                            continue;
                         }
+                        int crystals = Utils.getCrystals(itemStack) * itemStack.getAmount();
+                        if (crystals != 0) {
+                            island.setCrystals(island.getCrystals() + crystals);
+                            p.getInventory().clear(i);
+                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, crystals));
+                            return;
+                        }
+                        i++;
                     }
-                }
-            } else if (IridiumSkyblock.getConfiguration().bankWithdrawing){
-                if (e.getSlot() == (IridiumSkyblock.getInventories().experience.slot == null ? 11 : IridiumSkyblock.getInventories().experience.slot)) {
-                    if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
-                        if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                            Utils.setTotalExperience(p, Utils.getTotalExperience(p) + island.exp);
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -island.exp));
-                            island.exp = 0;
-                        }
-                    } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                        island.exp += Utils.getTotalExperience(p);
-                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
-                        Utils.setTotalExperience(p, 0);
-                    } else if (e.getClick().equals(ClickType.RIGHT)) {
-                        if (Utils.getTotalExperience(p) > 100) {
-                            island.exp += 100;
-                            Utils.setTotalExperience(p, Utils.getTotalExperience(p) - 100);
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, 100));
-                        } else {
-                            island.exp += Utils.getTotalExperience(p);
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, Utils.getTotalExperience(p)));
-                            Utils.setTotalExperience(p, 0);
-                        }
-                    } else if (e.getClick().equals(ClickType.LEFT)) {
-                        if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                            if (island.exp > 100) {
-                                island.exp -= 100;
-                                Utils.setTotalExperience(p, Utils.getTotalExperience(p) + 100);
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -100));
+                } else if (e.getClick().equals(ClickType.LEFT)) {
+                    if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
+                        if (island.getCrystals() > 0) {
+                            if (p.getInventory().firstEmpty() != -1) {
+                                island.setCrystals(island.getCrystals() - 1);
+                                p.getInventory().addItem(Utils.getCrystals(1));
+                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, -1));
                             } else {
-                                Utils.setTotalExperience(p, Utils.getTotalExperience(p) + island.exp);
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.EXPERIENCE, -island.exp));
-                                island.exp = 0;
+                                p.sendMessage(Utils.color(IridiumSkyblock.getMessages().inventoryFull
+                                        .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
                             }
                         }
                     }
                 }
-                if (e.getSlot() == (IridiumSkyblock.getInventories().crystals.slot == null ? 13 : IridiumSkyblock.getInventories().crystals.slot)) {
+            }
+            if (e.getSlot() == (IridiumSkyblock.getInventories().money.slot == null ? 15 : IridiumSkyblock.getInventories().money.slot)) {
+                if (IridiumSkyblock.getInstance().getEconomy() != null) {
                     if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
                         if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                            if (island.getCrystals() > 0) {
-                                if (p.getInventory().firstEmpty() != -1) {
-                                    p.getInventory().addItem(Utils.getCrystals(island.getCrystals()));
-                                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, -island.getCrystals()));
-                                    island.setCrystals(0);
-                                } else {
-                                    p.sendMessage(Utils.color(IridiumSkyblock.getMessages().inventoryFull
-                                            .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                                }
-                            }
+                            double depositValue = island.money;
+                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -depositValue));
+                            island.money = 0;
+                            IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, depositValue);
                         }
                     } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                        int i = 0;
-                        int total = 0;
-                        for (ItemStack itemStack : p.getInventory().getContents()) {
-                            if (itemStack == null) {
-                                i++;
-                                continue;
-                            }
-                            int crystals = Utils.getCrystals(itemStack) * itemStack.getAmount();
-                            if (crystals != 0) {
-                                island.setCrystals(island.getCrystals() + crystals);
-                                p.getInventory().clear(i);
-                                total += crystals;
-                            }
-                            i++;
-                        }
-                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, total));
+                        double playerBalance = IridiumSkyblock.getInstance().getEconomy().getBalance(p);
+                        IridiumSkyblock.getInstance().getEconomy().withdrawPlayer(p, playerBalance);
+                        if (IridiumSkyblock.getInstance().getEconomy().getBalance(p) == playerBalance) return;
+                        island.money += playerBalance;
+                        TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, playerBalance));
                     } else if (e.getClick().equals(ClickType.RIGHT)) {
-                        int i = 0;
-                        for (ItemStack itemStack : p.getInventory().getContents()) {
-                            if (itemStack == null) {
-                                i++;
-                                continue;
-                            }
-                            int crystals = Utils.getCrystals(itemStack) * itemStack.getAmount();
-                            if (crystals != 0) {
-                                island.setCrystals(island.getCrystals() + crystals);
-                                p.getInventory().clear(i);
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, crystals));
-                                return;
-                            }
-                            i++;
+                        double playerBalance = IridiumSkyblock.getInstance().getEconomy().getBalance(p);
+                        double depositValue = playerBalance > 1000 ? 1000 : playerBalance;
+                        if (!(island.money > Double.MAX_VALUE - depositValue)) {
+                            IridiumSkyblock.getInstance().getEconomy().withdrawPlayer(p, depositValue);
+                            if (IridiumSkyblock.getInstance().getEconomy().getBalance(p) == playerBalance) return;
+                            island.money += depositValue;
+                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, depositValue));
                         }
                     } else if (e.getClick().equals(ClickType.LEFT)) {
                         if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                            if (island.getCrystals() > 0) {
-                                if (p.getInventory().firstEmpty() != -1) {
-                                    island.setCrystals(island.getCrystals() - 1);
-                                    p.getInventory().addItem(Utils.getCrystals(1));
-                                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.CRYSTALS, -1));
-                                } else {
-                                    p.sendMessage(Utils.color(IridiumSkyblock.getMessages().inventoryFull
-                                            .replace("%prefix%", IridiumSkyblock.getConfiguration().prefix)));
-                                }
-                            }
-                        }
-                    }
-                }
-                if (e.getSlot() == (IridiumSkyblock.getInventories().money.slot == null ? 15 : IridiumSkyblock.getInventories().money.slot)) {
-                    if (IridiumSkyblock.getInstance().getEconomy() != null) {
-                        if (e.getClick().equals(ClickType.SHIFT_LEFT)) {
-                            if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                                double depositValue = island.money;
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -depositValue));
+                            if (island.money > 1000) {
+                                island.money -= 1000;
+                                IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, 1000);
+                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -1000));
+                            } else {
+                                double depositAmount = island.money;
                                 island.money = 0;
-                                IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, depositValue);
-                            }
-                        } else if (e.getClick().equals(ClickType.SHIFT_RIGHT)) {
-                            double playerBalance = IridiumSkyblock.getInstance().getEconomy().getBalance(p);
-                            IridiumSkyblock.getInstance().getEconomy().withdrawPlayer(p, playerBalance);
-                            island.money += playerBalance;
-                            TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, playerBalance));
-                        } else if (e.getClick().equals(ClickType.RIGHT)) {
-                            double depositValue = IridiumSkyblock.getInstance().getEconomy().getBalance(p) > 1000 ? 1000 : IridiumSkyblock.getInstance().getEconomy().getBalance(p);
-                            if (!(island.money > Double.MAX_VALUE - depositValue)) {
-                                IridiumSkyblock.getInstance().getEconomy().withdrawPlayer(p, depositValue);
-                                island.money += depositValue;
-                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, depositValue));
-                            }
-                        } else if (e.getClick().equals(ClickType.LEFT)) {
-                            if ((island.getPermissions((u.islandID == island.getId() || island.isCoop(u.getIsland())) ? (island.isCoop(u.getIsland()) ? Role.Member : u.getRole()) : Role.Visitor).withdrawBank) || u.bypassing) {
-                                if (island.money > 1000) {
-                                    island.money -= 1000;
-                                    IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, 1000);
-                                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -1000));
-                                } else {
-                                    double depositAmount = island.money;
-                                    island.money = 0;
-                                    IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, depositAmount);
-                                    TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -depositAmount));
-                                }
+                                IridiumSkyblock.getInstance().getEconomy().depositPlayer(p, depositAmount);
+                                TransactionLogger.saveBankBalanceChange(p, new Transaction().add(TransactionType.MONEY, -depositAmount));
                             }
                         }
                     }
