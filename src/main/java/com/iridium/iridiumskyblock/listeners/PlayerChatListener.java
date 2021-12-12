@@ -24,6 +24,11 @@ public class PlayerChatListener implements Listener {
         Optional<Island> island = user.getIsland();
         if (user.isIslandChat() && island.isPresent()) {
             event.setCancelled(true);
+            IridiumSkyblock.getInstance().getLogger().info(StringUtils.color(StringUtils.processMultiplePlaceholders(IridiumSkyblock.getInstance().getMessages().islandMemberChat, new PlaceholderBuilder().applyIslandPlaceholders(island.get()).build())
+                    .replace("%prefix%", IridiumSkyblock.getInstance().getConfiguration().prefix)
+                    .replace("%player%", event.getPlayer().getName())
+                    .replace("%message%", event.getMessage()))
+            );
             for (User islandUser : island.get().getMembers()) {
                 Player recipient = Bukkit.getPlayer(islandUser.getUuid());
                 if (recipient != null) {
