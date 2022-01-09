@@ -133,7 +133,6 @@ class IslandManagerTest {
         );
     }
 
-
     @Test
     public void getIslandById() {
         assertEquals(new IslandBuilder(1).build(), IridiumSkyblock.getInstance().getIslandManager().getIslandById(1).orElse(null));
