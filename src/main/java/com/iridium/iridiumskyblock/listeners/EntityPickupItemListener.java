@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class EntityPickupItemListener implements Listener {
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = false)
     @SuppressWarnings("deprecation")
     public void onEntityPickupItem(EntityPickupItemEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
