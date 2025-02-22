@@ -1,6 +1,6 @@
 package com.iridium.iridiumskyblock.managers;
 
-import com.iridium.iridiumcore.dependencies.xseries.XBiome;
+import com.cryptomorin.xseries.XBiome;
 import com.iridium.iridiumcore.utils.StringUtils;
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.iridium.iridiumskyblock.configs.Biomes;
@@ -20,7 +20,7 @@ public class BiomeManager {
         XBiome biome = biomeItem.biome;
         User user = IridiumSkyblock.getInstance().getUserManager().getUser(player);
         Optional<Island> island = user.getIsland();
-        Optional<XBiome> biomeOptional = XBiome.matchXBiome(biomeItem.biome.toString());
+        Optional<XBiome> biomeOptional = XBiome.of(biomeItem.biome.toString());
 
         if (!canPurchase(player, biomeItem)) {
             IridiumSkyblock.getInstance().getBiomes().failSound.play(player);

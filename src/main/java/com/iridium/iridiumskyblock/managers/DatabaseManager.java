@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -51,6 +52,11 @@ public class DatabaseManager {
         String databaseURL = getDatabaseURL(sqlConfig);
 
         DataPersisterManager.registerDataPersisters(XMaterialType.getSingleton());
+        DataPersisterManager.registerDataPersisters(XEntityTypeType.getSingleton());
+        DataPersisterManager.registerDataPersisters(XPotionType.getSingleton());
+        DataPersisterManager.registerDataPersisters(XEnchantmentType.getSingleton());
+        DataPersisterManager.registerDataPersisters(XBiomeType.getSingleton());
+
         DataPersisterManager.registerDataPersisters(LocationType.getSingleton());
         DataPersisterManager.registerDataPersisters(InventoryType.getSingleton());
         DataPersisterManager.registerDataPersisters(LocalDateTimeType.getSingleton());
